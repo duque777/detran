@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Bem-vindo</h1>
+  <input type="email" id="emailInput" placeholder="Digite seu e-mail">
+  <button onclick="salvarEmail()">Salvar</button>
+  <br><br>
+  <select id="emailSelect"></select>
+  <button onclick="entrar()">Entrar</button>
+
+  <script>
+    async function carregarEmails() {
+      const res = await fetch('/emails');
+      const emails = await res.json();
+      const select = document.getElementById('emailSelect');
+      select.innerHTML = emails.map(e => `<option value="${e.email}">${e.email}</option>`).join('');
+    }
+
+    async function salvarEmail() {
+      const email = document.getElementById('emailInput').value;
+      await fetch('/save-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      await carregarEmails();
+    }
+
+    async function entrar() {
+      const email = document.getElementById('emailSelect').value;
+      await fetch('/set-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      window.location.href = 'questoes.html';
+    }
+
+    carregarEmails();
+  </script>
+</body>
+</html>

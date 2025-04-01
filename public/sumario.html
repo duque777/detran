@@ -1,0 +1,50 @@
+<html>
+<head>
+  <title>Sumário</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="questoes.html">Questões</a>
+    <a href="sumario.html">Sumário</a>
+  </nav>
+
+  <h2>Resumo</h2>
+  <div id="resumo"></div>
+  <h3>Histórico de Questões</h3>
+  <table border="1">
+    <thead>
+      <tr><th>Questão</th><th>Respondida</th><th>Acertos</th><th>Erros</th><th>Ult. Acerto</th><th>Ult. Erro</th></tr>
+    </thead>
+    <tbody id="tabela"></tbody>
+  </table>
+
+  <script>
+    async function carregarResumo() {
+      const res = await fetch('/summary');
+      const data = await res.json();
+
+      document.getElementById('resumo').innerHTML = `
+        Simulados feitos: ${data.simulators}<br>
+        Questões respondidas: ${data.total}<br>
+        Acertos: ${data.correct}<br>
+        Erros: ${data.incorrect}<br>
+        Percentual de acerto: ${data.percent}%
+      `;
+
+      document.getElementById('tabela').innerHTML = data.questions.map(q => `
+        <tr>
+          <td>${q.question}</td>
+          <td>${q.times}</td>
+          <td>${q.correct}</td>
+          <td>${q.incorrect}</td>
+          <td>${q.last_correct || '-'}</td>
+          <td>${q.last_wrong || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    carregarResumo();
+  </script>
+</body>
+</html>

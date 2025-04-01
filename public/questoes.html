@@ -1,0 +1,44 @@
+<html>
+<head>
+  <title>Questões</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav>
+    <a href="questoes.html">Questões</a>
+    <a href="sumario.html">Sumário</a>
+  </nav>
+
+  <h2>Digite suas questões abaixo (1 por linha):</h2>
+  <textarea id="questions"></textarea>
+
+  <p>Marque as questões que você errou:</p>
+  <div class="checkbox-grid" id="checkboxes"></div>
+
+  <button onclick="salvarQuestoes()">Salvar</button>
+
+  <script>
+    for (let i = 1; i <= 30; i++) {
+      const div = document.getElementById('checkboxes');
+      const label = document.createElement('label');
+      label.innerHTML = `<input type='checkbox' value='${i}'> ${i}`;
+      div.appendChild(label);
+    }
+
+    async function salvarQuestoes() {
+      const text = document.getElementById('questions').value;
+      const checkboxes = Array.from(document.querySelectorAll('#checkboxes input:checked')).map(cb => cb.value);
+      const res = await fetch('/save-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questionsText: text, checkboxStates: checkboxes })
+      });
+
+      if (res.ok) {
+        alert('Questões salvas com sucesso!');
+        window.location.href = 'sumario.html';
+      } else alert(await res.text());
+    }
+  </script>
+</body>
+</html>
