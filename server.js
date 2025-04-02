@@ -63,6 +63,7 @@ app.get('/summary', async (req, res) => {
     FROM questions
     WHERE email = $1
     GROUP BY question
+    Order BY times, correct
   `, [currentUser]);
 
   res.json({ simulators, total, correct, incorrect, percent, questions: summary.rows });
