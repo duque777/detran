@@ -69,4 +69,24 @@ app.get('/summary', async (req, res) => {
   res.json({ simulators, total, correct, incorrect, percent, questions: summary.rows });
 });
 
+app.get('/desempenho', async (req, res) => {
+  try {
+    const resultado = await pool.query(`
+      SELECT 
+        TO_CHAR(DATE_TRUNC('minute', in_date), 'YYYY-MM-DD HH24:MI') AS periodo,
+        ROUND((COUNT(*) FILTER (WHERE is_correct = true)::float / NULLIF(COUNT(*), 0)) * 100, 2) AS percentual
+      FROM questions
+      WHERE email = $1
+      GROUP BY DATE_TRUNC('minute', in_date)
+      ORDER BY DATE_TRUNC('minute', in_date)
+    `, [currentUser]);
+
+    res.json(resultado.rows);
+  } catch (err) {
+    console.error('Erro na rota /desempenho:', err);
+    res.status(500).send('Erro ao buscar desempenho');
+  }
+});
+
+
 app.listen(3000, () => console.log('Servidor rodando em http://localhost:3000'));
