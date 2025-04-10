@@ -72,13 +72,16 @@ app.get('/summary', async (req, res) => {
 app.get('/desempenho', async (req, res) => {
   try {
     const resultado = await pool.query(`
-      SELECT 
-        TO_CHAR(DATE_TRUNC('minute', in_date), 'YYYY-MM-DD HH24:MI') AS periodo,
-        ROUND((COUNT(*) FILTER (WHERE is_correct = true)::float / NULLIF(COUNT(*), 0)) * 100, 2) AS percentual
-      FROM questions
-      WHERE email = $1
-      GROUP BY DATE_TRUNC('minute', in_date)
-      ORDER BY DATE_TRUNC('minute', in_date)
+SELECT 
+  TO_CHAR(DATE_TRUNC('minute', in_date), 'YYYY-MM-DD HH24:MI') AS periodo,
+  ROUND(
+    (COUNT(*) FILTER (WHERE is_correct = true)::numeric / NULLIF(COUNT(*), 0)) * 100,
+    2
+  ) AS percentual
+FROM questions
+WHERE email = $1
+GROUP BY DATE_TRUNC('minute', in_date)
+ORDER BY DATE_TRUNC('minute', in_date)
     `, [currentUser]);
 
     res.json(resultado.rows);
